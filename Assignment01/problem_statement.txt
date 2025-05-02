@@ -1,0 +1,22 @@
+You are given a nxn 2D grid where there is a starting cell and an ending cell. Each cell of the grid is represented by one of these following pair of numbers:
+
+(0, w, x, y, z) -> starting cell
+(1, w, x, y, z) -> Ending cell
+(3, -1, -1, -1, -1) -> Obstacle cells where you can not visit
+(2, w, x, y, z) -> the cost of going to the upper cell = w, right cell = x, below cell = y, left cell = z (if that cell is (-1,-1)), the value of w/x/y/z will also be -1.
+
+here, w, x, y, z >= 1
+the values of w,x,y,z can not be -1 unless it is an obstacle cell. if it is an obstacle cell, all four of (w,x,y,z) will be equal to -1.
+
+There will be exactly one starting cell and one ending cell.
+The obstacle cells must be given in a way that there must be at least one valid path from the starting cell to ending cell without visiting any obstacle cell.
+The valid path may go to any direction. It is not bound to go only right and down. But the path should not visit one cell more than once.
+
+Give a python code where I will give the value of n (2 <= n <= 2000) and it will give an accurate grid.
+
+for example, the cell (i, j)-s x value must be equal to the z value of the cell (i, j+1) and vice versa.
+the cell (i, j)-s w value must be equal to the y value of the cell (i-1, j) and vice versa.
+the cell (i, j)-s y value must be equal to the w value of the cell (i+1, j) and vice versa.
+the cell (i, j)-s z value must be equal to the x value of the cell (i, j-1) and vice versa.
+
+The grid must also have at least one path from the starting cell to the ending cell.
