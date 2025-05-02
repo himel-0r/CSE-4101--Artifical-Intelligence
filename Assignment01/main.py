@@ -9,6 +9,9 @@ class graph:
         self.col = len(array)
         self.graph = self.build_graph(array)
         self.start, self.end = self.find_terminals(array)
+        self.last_path = []
+        # self.visit_freq = None
+        self.visit_frequency = None
         
     def find_terminals(self, array):
         start = None
@@ -44,9 +47,13 @@ class graph:
         queue = deque()
         queue.append((self.start, 0, 0)) # (node, path lenght, total cost)
         visited[self.start] = True
+        self.visit_frequency = [[0 for _ in range(self.col * 2)] for _ in range(self.row * 2)]
+        self.visit_frequency[self.start // self.row][self.start % self.col] += 1
+        
         
         while queue:
             node, path_len, cost = queue.popleft()
+            self.visit_frequency[node//self.row][node%self.col] += 1
             if node == self.end:
                 path = []
                 cur = node
@@ -54,6 +61,7 @@ class graph:
                     path.append((cur // self.row, cur % self.col))
                     cur = parent[cur]
                 path.reverse
+                self.last_path = path
                 print("BFS Path:")
                 print(path)
                 print(f"Path length = {path_len}, Total cost = {cost}")
@@ -72,8 +80,11 @@ class graph:
         visited = [False] * self.n * 2
         parent = [-1] * self.n * 2
         result = []
+        self.visit_frequency = [[0 for _ in range(self.col * 2)] for _ in range(self.row * 2)]
+        self.visit_frequency[self.start // self.row][self.start % self.col] += 1
         
         def dfs_visit(node, lenght, cost):
+            self.visit_frequency[node//self.row][node%self.col] += 1
             if node == self.end:
                 result.append((lenght, cost))
                 return True
@@ -93,6 +104,7 @@ class graph:
                 path.append((cur // self.row, cur % self.col))
                 cur = parent[cur]
             path.reverse()
+            self.last_path = path
             print("DFS Path:")
             print(path)
             print(f"Path length = {result[0][0]}, Total cost = {result[0][1]}")
@@ -105,14 +117,18 @@ class graph:
         visited = [False] * self.n * 2
         path = []
         found = [False]
+        self.visit_frequency = [[0 for _ in range(self.col*2)] for _ in range(self.row*2)]
+        self.visit_frequency[self.start // self.row][self.start % self.col] += 1
         
         def dfs(node, depth, cost):
+            self.visit_frequency[node//self.row][node%self.col] += 1
             if depth > limit or found[0]:
                 return
             visited[node] = True
             path.append((node // self.row, node % self.col))
             
             if node == self.end:
+                self.last_path = path.copy()
                 print("DLS Path:", path)
                 print(f"Path Length: {len(path) - 1}")
                 print("Total Cost:", cost)
@@ -136,11 +152,14 @@ class graph:
         dist = [float('inf')] * self.n * 2
         parent = [-1] * self.n * 2
         dist[self.start] = 0
+        self.visit_frequency = [[0 for _ in range(self.col*2)] for _ in range(self.row*2)]
+        self.visit_frequency[self.start // self.row][self.start % self.col] += 1
         
         pq = [(0, self.start)] # (cost, node)
         
         while pq:
             cost, node = heapq.heappop(pq)
+            self.visit_frequency[node//self.row][node%self.col] += 1
             if node == self.end:
                 break
             if cost > dist[node]:
@@ -162,7 +181,7 @@ class graph:
             path.append((current // self.row, current % self.col))
             current = parent[current]
         path.reverse()  
-        
+        self.last_path = path
         print("UCS Path:")
         print(path)
         path_len = len(path) - 1
@@ -174,14 +193,18 @@ class graph:
             visited = [False] * self.n * 2
             path = []
             found = [False]
+            self.visit_frequency = [[0 for _ in range(self.col*2)] for _ in range(self.row*2)]
+            self.visit_frequency[self.start // self.row][self.start % self.col] += 1
             
             def dfs(node, depth, cost):
+                self.visit_frequency[node//self.row][node%self.col] += 1
                 if depth > limit or found[0]:
                     return
                 visited[node] = True
                 path.append((node // self.row, node % self.col))
                 
                 if node == self.end:
+                    self.last_path = path.copy()
                     print(f"IDS (Depth {limit}) path: {path}")
                     print(f"Path length: {len(path)-1}")
                     print(f"Total cost: {cost}")
@@ -212,15 +235,19 @@ class graph:
         
         visited = [False] * self.n * 2
         pq = [(heuristic(self.start), self.start, [self.start])] # (heuristic, node, path)
+        self.visit_frequency = [[0 for _ in range(self.col*2)] for _ in range(self.row*2)]
+        self.visit_frequency[self.start // self.row][self.start % self.col] += 1
         
         while pq:
             h, u, path = heapq.heappop(pq)
+            self.visit_frequency[u//self.row][u%self.col] += 1
             if visited[u]:
                 continue
             visited[u] = True
             
             if u == self.end:
                 path_cor = [(cur // self.row, cur % self.col) for cur in path]
+                self.last_path = path_cor
                 print(f"Best-First Search Path: {path_cor}")
                 print(f"Path Length: {len(path) - 1}")
                 return
@@ -242,16 +269,19 @@ class graph:
         
         visited = [False] * self.n * 2
         open_set = [(heuristic(self.start), 0, self.start, [self.start])] 
+        self.visit_frequency = [[0 for _ in range(self.col*2)] for _ in range(self.row*2)]
+        self.visit_frequency[self.start // self.row][self.start % self.col] += 1
         
         while open_set:
             f, g, u, path = heapq.heappop(open_set)
-            
+            self.visit_frequency[u//self.row][u%self.col] += 1
             if visited[u]:
                 continue
             visited[u] = True
             
             if u == self.end:
                 path_cor = [(cur // self.row, cur % self.col) for cur in path]
+                self.last_path = path_cor
                 print(f"A* path: {path_cor}")
                 print(f"Total cost: {g}")
                 print(f"Path length: {len(path)-1}")
@@ -276,16 +306,20 @@ class graph:
         
         visited = [False] * self.n * 2
         open_set = [(heuristic(self.start), 0, self.start, [self.start])] 
+        self.visit_frequency = [[0 for _ in range(self.col*2)] for _ in range(self.row*2)]
+        self.visit_frequency[self.start // self.row][self.start % self.col] += 1
         
         while open_set:
             f, g, u, path = heapq.heappop(open_set)
-            
+            self.visit_frequency[u//self.row][u%self.col] += 1
             if visited[u]:
                 continue
             visited[u] = True
             
             if u == self.end:
-                print(f"A* path: {path}")
+                path_cor = [(cur // self.row, cur % self.col) for cur in path]
+                self.last_path = path_cor
+                print(f"A* path: {path_cor}")
                 print(f"Total cost: {g}")
                 print(f"Path length: {len(path)-1}")
                 return

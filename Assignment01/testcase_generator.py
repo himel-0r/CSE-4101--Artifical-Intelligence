@@ -9,11 +9,12 @@ def generate_grid(n, percentage):
 
     def in_bounds(i, j): return 0 <= i < n and 0 <= j < n
 
-    while True:
-        si, sj = random.randint(0, n-1), random.randint(0, n-1)
-        ei, ej = random.randint(0, n-1), random.randint(0, n-1)
-        if (si, sj) != (ei, ej):
-            break
+    # while True:
+    #     si, sj = random.randint(2, (n-1)//2), random.randint(2, (n-1)//2)
+    #     ei, ej = random.randint((n//2), n-3), random.randint((n//2), n-3)
+    #     if (si, sj) != (ei, ej):
+    #         break
+    si, sj, ei, ej = 1, 1, n-2, n-2
 
     # BFS to build a guaranteed path
     visited = [[False]*n for _ in range(n)]
@@ -40,15 +41,29 @@ def generate_grid(n, percentage):
         print("path not found error")
         return generate_grid(n)  # Retry if no path found
     
-    path = [(ei, ej)]
-    cur = (ei, ej)
-    while cur != (si, sj):
-        cur = parent[cur]
+    path = [(si, sj)]
+    cur = (si, sj)
+    # while cur != (si, sj):
+    #     cur = parent[cur]
+    #     path.append(cur)
+    # path.reverse()
+    # path_set = set(path)
+    
+    while cur != (n-1, sj):
+        ex, ey = cur
+        cur = (ex+1, ey)
         path.append(cur)
-    path.reverse()
-    path_set = set(path)
+    while cur != (n-1, ej):
+        ex, ey = cur
+        cur = (ex, ey+1)
+        path.append(cur)
+    while cur != (ei, ej):
+        ex, ey = cur
+        cur = (ex-1, ey)
+        path.append(cur)
     
     # print(path)
+    path_set = set(path)
 
     # # Step 1: Fill everything as type-2 with full costs
     grid = [[[2] + [-10 for _ in range(4)] for _ in range(n)] for _ in range(n)]
@@ -88,8 +103,8 @@ def generate_grid(n, percentage):
     return grid
 
 # Example usage
-n = 60
-grid = generate_grid(n, 60)
+n = 20
+grid = generate_grid(n, 40)
 print(grid)
 # for i in range(len(grid)):
 #     row = grid[i]
