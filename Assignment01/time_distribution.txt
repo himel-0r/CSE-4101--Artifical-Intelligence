@@ -1,0 +1,8 @@
+Total time = 10 hours
+
+Study                90
+Code                 60
+Dataset              60
+Graph generation    120
+Report               90
+Others              180
