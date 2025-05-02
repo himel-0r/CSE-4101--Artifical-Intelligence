@@ -1,5 +1,6 @@
 import ast
 from collections import deque
+import heapq
 
 class graph:
     def __init__(self, array):
@@ -100,6 +101,104 @@ class graph:
             print("DFS: No path found!")
             return -1 -1
 
+    def dls(self, limit):
+        visited = [False] * self.n * 2
+        path = []
+        found = [False]
+        
+        def dfs(node, depth, cost):
+            if depth > limit or found[0]:
+                return
+            visited[node] = True
+            path.append(node)
+            
+            if node == self.end:
+                print("DLS Path:", path)
+                print("Path Length:", len(path) - 1)
+                print("Total Cost:", cost)
+                found[0] = True
+                return
+            
+            for neighbor, weight in self.graph[node]:
+                if not visited[neighbor]:
+                    if dfs(neighbor, depth+1, cost+weight):
+                        return True 
+            path.pop()
+            visited[node] = False
+        
+        dfs(self.start, 0, 0)
+
+        if not found[0]:
+            print(f"No path found within DLS limit {limit}")
+
+    def ucs(self):
+        dist = [float('inf')] * self.n * 2
+        parent = [-1] * self.n * 2
+        dist[self.start] = 0
+        
+        pq = [(0, self.start)] # (cost, node)
+        
+        while pq:
+            cost, node = heapq.heappop(pq)
+            if node == self.end:
+                break
+            if cost > dist[node]:
+                continue
+            
+            for neighbor, weight in self.graph[node]:
+                if dist[neighbor] > dist[node] + weight:
+                    dist[neighbor] = dist[node] + weight
+                    parent[neighbor] = node
+                    heapq.heappush(pq, (dist[neighbor], neighbor))
+        
+        if dist[self.end] == float('inf'):
+            print("UCS: No path found!!")
+            return
+        
+        path = []
+        current = self.end
+        while current != -1:
+            path.append(current)
+            current = parent[current]
+        path.reverse()  
+        
+        print("UCS Path:")
+        print(path)
+        print(f"Path length: {len(path) - 1}")
+        print(f"Total cost: {dist[self.end]}")   
+
+    def ids(self, max_depth = 10000000):
+        for limit in range(max_depth + 1):
+            visited = [False] * self.n * 2
+            path = []
+            found = [False]
+            
+            def dfs(node, depth, cost):
+                if depth > limit or found[0]:
+                    return
+                visited[node] = True
+                path.append(node)
+                
+                if node == self.end:
+                    print(f"IDS (Depth {limit}) path: {path}")
+                    print(f"Path length: {len(path)-1}")
+                    print(f"Total cost: {cost}")
+                    found[0] = True
+                    return
+                
+                for neighbor, weight in self.graph[node]:
+                    if not visited[neighbor]:
+                        dfs(neighbor, depth+1, cost+weight)
+                        
+                path.pop()
+                visited[node] = False
+            
+            dfs(self.start, 0, 0)
+            
+            if found[0]:
+                return
+        print("No path found within max depth limit!")
+
 if __name__ == "__main__":
     with open("tc1.in", "r", encoding="utf-8", errors="ignore") as f:
         content = f.read().replace('\x00', '')
@@ -107,8 +206,13 @@ if __name__ == "__main__":
     grid = graph(array)
     
     # print(grid.graph)
-    print(grid.start)
-    print(grid.end)
-    len, cost = grid.bfs()
-    len, cost = grid.dfs()
+    # print(grid.start)
+    # print(grid.end)
+    
+    # len, cost = grid.bfs()
+    # len, cost = grid.dfs()
+    # grid.dls(40)
+    # grid.ucs()
+    # grid.ids()
+    
     
