@@ -51,7 +51,7 @@ class graph:
                 path = []
                 cur = node
                 while cur != -1:
-                    path.append(cur)
+                    path.append((cur // self.row, cur % self.col))
                     cur = parent[cur]
                 path.reverse
                 print("BFS Path:")
@@ -68,7 +68,7 @@ class graph:
         print("BFS: No path found!")
         return -1, -1
     
-    def dfs(self):
+    def dfs_main(self):
         visited = [False] * self.n * 2
         parent = [-1] * self.n * 2
         result = []
@@ -90,7 +90,7 @@ class graph:
             path = []
             cur = self.end
             while cur != -1:
-                path.append(cur)
+                path.append((cur // self.row, cur % self.col))
                 cur = parent[cur]
             path.reverse()
             print("DFS Path:")
@@ -110,12 +110,13 @@ class graph:
             if depth > limit or found[0]:
                 return
             visited[node] = True
-            path.append(node)
+            path.append((node // self.row, node % self.col))
             
             if node == self.end:
                 print("DLS Path:", path)
-                print("Path Length:", len(path) - 1)
+                print(f"Path Length: {len(path) - 1}")
                 print("Total Cost:", cost)
+                print(f"Depth limit: {limit}")
                 found[0] = True
                 return
             
@@ -158,17 +159,18 @@ class graph:
         path = []
         current = self.end
         while current != -1:
-            path.append(current)
+            path.append((current // self.row, current % self.col))
             current = parent[current]
         path.reverse()  
         
         print("UCS Path:")
         print(path)
-        print(f"Path length: {len(path) - 1}")
+        path_len = len(path) - 1
+        print(f"Path length: {path_len}")
         print(f"Total cost: {dist[self.end]}")   
 
-    def ids(self, max_depth = 10000000):
-        for limit in range(max_depth + 1):
+    def ids(self, max_depth = 1000):
+        for limit in range(50, max_depth + 1, 50):
             visited = [False] * self.n * 2
             path = []
             found = [False]
@@ -177,7 +179,7 @@ class graph:
                 if depth > limit or found[0]:
                     return
                 visited[node] = True
-                path.append(node)
+                path.append((node // self.row, node % self.col))
                 
                 if node == self.end:
                     print(f"IDS (Depth {limit}) path: {path}")
@@ -199,20 +201,126 @@ class graph:
                 return
         print("No path found within max depth limit!")
 
+    def best_first(self):
+        def get_coordinate(node):
+            return node//self.row, node %self.col
+        
+        def heuristic(node):
+            x1, y1 = get_coordinate(node)
+            x2, y2 = get_coordinate(self.end)
+            return abs(x1-x2) + abs(y1-y2) # Manhattan distance
+        
+        visited = [False] * self.n * 2
+        pq = [(heuristic(self.start), self.start, [self.start])] # (heuristic, node, path)
+        
+        while pq:
+            h, u, path = heapq.heappop(pq)
+            if visited[u]:
+                continue
+            visited[u] = True
+            
+            if u == self.end:
+                path_cor = [(cur // self.row, cur % self.col) for cur in path]
+                print(f"Best-First Search Path: {path_cor}")
+                print(f"Path Length: {len(path) - 1}")
+                return
+            
+            for v, _ in self.graph[u]:
+                if not visited[v]:
+                    heapq.heappush(pq, (heuristic(v), v, path + [v]))
+        
+        print("No path found using Best-First Search!")
+
+    def a_star(self):
+        def get_coordinate(node):
+            return node//self.row, node %self.col
+        
+        def heuristic(node):
+            x1, y1 = get_coordinate(node)
+            x2, y2 = get_coordinate(self.end)
+            return abs(x1-x2) + abs(y1-y2) # Manhattan distance
+        
+        visited = [False] * self.n * 2
+        open_set = [(heuristic(self.start), 0, self.start, [self.start])] 
+        
+        while open_set:
+            f, g, u, path = heapq.heappop(open_set)
+            
+            if visited[u]:
+                continue
+            visited[u] = True
+            
+            if u == self.end:
+                path_cor = [(cur // self.row, cur % self.col) for cur in path]
+                print(f"A* path: {path_cor}")
+                print(f"Total cost: {g}")
+                print(f"Path length: {len(path)-1}")
+                return
+            
+            for v, cost in self.graph[u]:
+                if not visited[v]:
+                    new_g = g + cost
+                    new_f = new_g + heuristic(v)
+                    heapq.heappush(open_set, (new_f, new_g, v, path + [v]))
+                    
+        print("No path found using A* search!!")
+
+    def weighted_a_star(self, w):
+        def get_coordinate(node):
+            return node//self.row, node %self.col
+        
+        def heuristic(node):
+            x1, y1 = get_coordinate(node)
+            x2, y2 = get_coordinate(self.end)
+            return abs(x1-x2) + abs(y1-y2) # Manhattan distance
+        
+        visited = [False] * self.n * 2
+        open_set = [(heuristic(self.start), 0, self.start, [self.start])] 
+        
+        while open_set:
+            f, g, u, path = heapq.heappop(open_set)
+            
+            if visited[u]:
+                continue
+            visited[u] = True
+            
+            if u == self.end:
+                print(f"A* path: {path}")
+                print(f"Total cost: {g}")
+                print(f"Path length: {len(path)-1}")
+                return
+            
+            for v, cost in self.graph[u]:
+                if not visited[v]:
+                    new_g = g + cost
+                    new_f = new_g + w * heuristic(v)
+                    heapq.heappush(open_set, (new_f, new_g, v, path + [v]))
+                    
+        print("No path found using weighted-A* search!!")
+
+
 if __name__ == "__main__":
-    with open("tc1.in", "r", encoding="utf-8", errors="ignore") as f:
+    with open("testcase1", "r", encoding="utf-8", errors="ignore") as f:
         content = f.read().replace('\x00', '')
     array = ast.literal_eval(content)
     grid = graph(array)
     
-    # print(grid.graph)
     # print(grid.start)
     # print(grid.end)
     
-    # len, cost = grid.bfs()
-    # len, cost = grid.dfs()
-    # grid.dls(40)
-    # grid.ucs()
-    # grid.ids()
+    length, cost = grid.bfs()
+    print()
+    length, cost = grid.dfs_main()
+    print()
+    grid.dls(100)
+    print()
+    grid.ucs()
+    print()
+    grid.ids()
+    print()
+    grid.best_first()
+    print()
+    grid.a_star()
+    
     
     

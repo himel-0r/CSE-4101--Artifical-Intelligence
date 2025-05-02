@@ -1,7 +1,7 @@
 import random
 from collections import deque
 
-def generate_grid(n):
+def generate_grid(n, percentage):
     dirs = [(-1, 0), (0, 1), (1, 0), (0, -1)]  # U, R, D, L
     opp = [2, 3, 0, 1]
 
@@ -70,7 +70,7 @@ def generate_grid(n):
     # Step 3: Add obstacles (type-3) not in path
     for i in range(n):
         for j in range(n):
-            if (i, j) not in path_set and random.random() < 0.3:
+            if (i, j) not in path_set and random.random() < percentage/100:
                 grid[i][j] = [3, -1, -1, -1, -1]
                 if i > 0:
                     grid[i-1][j][3] = -1
@@ -88,8 +88,8 @@ def generate_grid(n):
     return grid
 
 # Example usage
-n = 5
-grid = generate_grid(n)
+n = 60
+grid = generate_grid(n, 60)
 print(grid)
 # for i in range(len(grid)):
 #     row = grid[i]
