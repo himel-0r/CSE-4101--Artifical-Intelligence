@@ -3,7 +3,6 @@ import numpy as np
 from collections import defaultdict
 
 def cartesian_product(domains: List[Set[Any]]) -> List[Tuple]:
-    """Generate all possible combinations of variable assignments."""
     if not domains:
         return [()]
     result = []
@@ -13,7 +12,6 @@ def cartesian_product(domains: List[Set[Any]]) -> List[Tuple]:
     return result
 
 def function_decomposing(Fk: Dict[Tuple, float], vars: List[str], domains: List[Set[Any]]) -> Dict[Tuple, float]:
-    """Function Decomposing (FD) for computing function estimations (Algorithm 1)."""
     n = len(vars)
     fun_est = {}
     
@@ -45,13 +43,11 @@ def function_decomposing(Fk: Dict[Tuple, float], vars: List[str], domains: List[
                             max_val = max(max_val, fun_est[key])
                     for state in Fk:
                         fun_est[(i, state[i], j, vj)] = max_val
-    
     return fun_est
 
 def state_pruning(Fk: Dict[Tuple, float], xi: str, Mxj_minus_xi: List[Dict[Any, float]], 
                   states: List[Tuple], xi_idx: int, fun_est: Dict[Tuple, float], 
                   vars_in_func: List[str], domains: List[Set[Any]]) -> Tuple[Dict[Any, float], float]:
-    """State Pruning (SP) for computing function-to-variable message (Algorithm 2)."""
     n = len(vars_in_func)
     result = {state: 0.0 for state in domains[xi_idx]}
     lb = float('-inf')

@@ -3,7 +3,6 @@ import numpy as np
 from collections import defaultdict
 
 def binary_search(values: List[float], target: float) -> float:
-    """Perform binary search to find the largest value <= target in a sorted list."""
     left, right = 0, len(values) - 1
     result = -float('inf')
     
@@ -19,19 +18,6 @@ def binary_search(values: List[float], target: float) -> float:
 
 def gdp(Fj: Dict[Tuple, float], xi: str, Mxj_minus_xi: List[Dict[Any, float]], 
         states: List[Tuple], xi_idx: int) -> Dict[Any, Tuple[float, float]]:
-    """
-    Generic Domain Pruning (GDP) algorithm for DCOPs.
-    
-    Args:
-        Fj: Local utility function mapping state combinations to utility values.
-        xi: Variable node receiving the message from Fj.
-        Mxj_minus_xi: List of messages from neighboring variable nodes except xi.
-        states: List of state tuples corresponding to domains of variables in xj.
-        xi_idx: Index of xi in the state tuples.
-    
-    Returns:
-        Dictionary mapping each state of xi to a tuple of [max_utility, pruned_utility].
-    """
     sorted_utils = {}
     for state in set(s[xi_idx] for s in states):
         relevant_states = [s for s in states if s[xi_idx] == state]
@@ -60,19 +46,6 @@ def gdp(Fj: Dict[Tuple, float], xi: str, Mxj_minus_xi: List[Dict[Any, float]],
 
 def gd2p(Fj: Dict[Tuple, float], xi: str, Mxj_minus_xi: List[Dict[Any, float]], 
          states: List[Tuple], xi_idx: int) -> Dict[Any, Tuple[float, float]]:
-    """
-    Generic Domain Dynamic Pruning (GD²P) algorithm for DCOPs.
-    
-    Args:
-        Fj: Local utility function mapping state combinations to utility values.
-        xi: Variable node receiving the message from Fj.
-        Mxj_minus_xi: List of messages from neighboring variable nodes except xi.
-        states: List of state tuples corresponding to domains of variables in xj.
-        xi_idx: Index of xi in the state tuples.
-    
-    Returns:
-        Dictionary mapping each state of xi to a tuple of [max_utility, pruned_utility].
-    """
     sorted_utils = {}
     for state in set(s[xi_idx] for s in states):
         relevant_states = [s for s in states if s[xi_idx] == state]
@@ -203,7 +176,6 @@ class MaxSumWithGD2P:
         return message, pruned_percentage
 
     def _cartesian_product(self, domains: List[Set[Any]]) -> List[Tuple]:
-        """Generate all possible combinations of domain values."""
         if not domains:
             return [()]
         result = []
@@ -213,7 +185,6 @@ class MaxSumWithGD2P:
         return result
 
     def compute_local_objective(self, var: str) -> Dict[Any, float]:
-        """Compute local objective function Z_i(x_i) (Equation 4)."""
         Z = {state: 0.0 for state in self.graph.variables[var]}
         for func in self.graph.var_to_funcs[var]:
             for state in Z:
@@ -221,7 +192,6 @@ class MaxSumWithGD2P:
         return Z
 
     def select_optimal_assignment(self) -> Dict[str, Any]:
-        """Select the value that maximizes Z_i(x_i) for each variable."""
         assignment = {}
         for var in self.graph.variables:
             Z = self.compute_local_objective(var)
@@ -230,7 +200,6 @@ class MaxSumWithGD2P:
         return assignment
 
     def run(self) -> Tuple[Dict[str, Any], float]:
-        """Run Max-Sum algorithm with GDP or GD²P for a fixed number of iterations."""
         for iteration in range(self.max_iterations):
             var_to_func = {}
             for var in self.graph.variables:
