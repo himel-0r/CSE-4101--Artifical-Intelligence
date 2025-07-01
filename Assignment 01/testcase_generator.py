@@ -8,12 +8,7 @@ def generate_grid(n, percentage):
     def random_cost(): return random.randint(1, 10)
 
     def in_bounds(i, j): return 0 <= i < n and 0 <= j < n
-
-    # while True:
-    #     si, sj = random.randint(2, (n-1)//2), random.randint(2, (n-1)//2)
-    #     ei, ej = random.randint((n//2), n-3), random.randint((n//2), n-3)
-    #     if (si, sj) != (ei, ej):
-    #         break
+    
     si, sj, ei, ej = 1, 1, n-2, n-2
 
     # BFS to build a guaranteed path
@@ -106,10 +101,3 @@ def generate_grid(n, percentage):
 n = 20
 grid = generate_grid(n, 40)
 print(grid)
-# for i in range(len(grid)):
-#     row = grid[i]
-#     if i < len(grid)-1:
-#         print(row, end=',')
-#         print()
-#     else:
-#         print(row)
